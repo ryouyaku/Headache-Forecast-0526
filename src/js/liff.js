@@ -6,7 +6,7 @@
 
 // Replace with your actual LIFF ID from LINE Developers Console
 // LIFF IDを実際のIDに変更してください
-const LIFF_ID = "your-liff-id-here";
+const LIFF_ID = "2007239534-bnjnyNja";
 
 // LIFF configuration
 const LIFF_CONFIG = {
