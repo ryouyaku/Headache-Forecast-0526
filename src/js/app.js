@@ -9,7 +9,7 @@ const DEBUG_MODE = false;
 
 // GAS Web App URL - 実際のURL に変更してください
 // GASでWebアプリをデプロイした後に取得できるURLを設定
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPIjg-fPB_BYQ3sSn6-HHgvQoMcZJXoFdEj8zZg01DRyOujtKYZOGKo5nzc6I5dt7w/exec';
 
 // Application state
 let appState = {
