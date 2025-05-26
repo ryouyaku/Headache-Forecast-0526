@@ -1,0 +1,63 @@
+MIT License
+
+Copyright (c) 2024 Headache Forecast App
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Third-party Licenses
+
+This project uses the following third-party services and libraries:
+
+### OpenWeatherMap API
+- Service: Weather data API
+- Website: https://openweathermap.org/
+- License: Data provided under OpenWeatherMap Terms of Service
+- Usage: Weather information for headache risk calculation
+
+### LINE LIFF SDK
+- Library: LINE Front-end Framework SDK
+- Website: https://developers.line.biz/
+- License: LINE Corporation Terms of Service
+- Usage: Integration with LINE messaging platform
+
+### Tailwind CSS
+- Library: CSS framework
+- Website: https://tailwindcss.com/
+- License: MIT License
+- Usage: UI styling and responsive design
+
+### Google Apps Script
+- Platform: Google Cloud Platform
+- Website: https://script.google.com/
+- License: Google Cloud Platform Terms of Service
+- Usage: Backend API proxy for weather data
+
+## Attribution
+
+Weather data provided by OpenWeatherMap (https://openweathermap.org/)
+Icons and UI components inspired by modern web design patterns
+Prefecture and city data compiled from publicly available sources
+
+## Disclaimer
+
+This application provides weather-based headache risk predictions for informational purposes only. It is not intended as medical advice, diagnosis, or treatment. Users should consult healthcare professionals for medical concerns.
+
+The accuracy of weather data and headache risk calculations may vary. The developers are not responsible for any decisions made based on the information provided by this application.
