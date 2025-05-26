@@ -1,0 +1,100 @@
+{
+  "name": "headache-forecast-liff",
+  "version": "1.0.0",
+  "description": "LINE LIFF app for headache forecasting based on weather data",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "npx http-server src -p 3000 -c-1",
+    "dev": "npx http-server src -p 3000 -c-1 -o",
+    "build": "node scripts/build.js",
+    "test": "npm run test:html && npm run test:js",
+    "test:html": "npx html-validate src/**/*.html",
+    "test:js": "npx eslint src/js/**/*.js",
+    "lint": "npx eslint src/js/**/*.js --fix",
+    "format": "npx prettier --write \"src/**/*.{html,css,js,json}\"",
+    "validate": "npm run test && npm run lint",
+    "serve": "npx http-server src -p 8080 -c-1",
+    "deploy": "echo 'Deployment handled by GitHub Actions'",
+    "gas:upload": "node scripts/upload-gas.js",
+    "config:check": "node scripts/check-config.js"
+  },
+  "keywords": [
+    "LINE",
+    "LIFF",
+    "headache",
+    "weather",
+    "forecast",
+    "healthcare",
+    "PWA"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/headache-forecast.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/headache-forecast/issues"
+  },
+  "homepage": "https://your-username.github.io/headache-forecast/",
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.0",
+    "html-validate": "^8.0.0",
+    "http-server": "^14.1.1",
+    "node-fetch": "^3.3.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "iOS >= 12",
+    "Android >= 8"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "config": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "off",
+      "prefer-const": "error",
+      "no-var": "error"
+    },
+    "globals": {
+      "liff": "readonly",
+      "debugLog": "readonly",
+      "prefectures": "readonly",
+      "majorCities": "readonly"
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": true,
+    "tabWidth": 2,
+    "printWidth": 100,
+    "trailingComma": "es5"
+  },
+  "dependencies": {}
+}
