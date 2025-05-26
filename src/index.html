@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>頭痛予報</title>
+  <meta name="description" content="気象データに基づいて頭痛リスクを予測するLIFFアプリ">
+  <meta name="keywords" content="頭痛,天気,気圧,予報,LINE">
+  
+  <!-- PWA設定 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00B900">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="頭痛予報">
+  
+  <!-- CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="favicon.ico">
+</head>
+<body class="gradient-bg min-h-screen font-sans">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- ヘッダー -->
+    <header class="text-center mb-8">
+      <div class="mb-4">
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">🌤️ 頭痛予報</h1>
+        <p class="text-gray-600 text-lg">お住まいの地域の天気から頭痛リスクを予測します</p>
+      </div>
+      
+      <!-- 説明カード -->
+      <div class="bg-white bg-opacity-80 rounded-lg p-4 mx-auto max-w-2xl">
+        <p class="text-sm text-gray-700">
+          気圧の変化は頭痛の原因となることがあります。<br>
+          このアプリで事前にリスクを把握し、適切な対策を取りましょう。
+        </p>
+      </div>
+    </header>
+
+    <!-- 地域選択フォーム -->
+    <div id="search-section" class="card bg-white p-6 mb-8">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+        📍 地域選択
+      </h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label for="prefecture" class="block text-gray-700 font-medium mb-2">
+            都道府県 <span class="text-red-500">*</span>
+          </label>
+          <select 
+            id="prefecture" 
+            class="form-select w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+          >
+            <option value="">都道府県を選択してください</option>
+            <!-- JavaScript で動的に追加されます -->
+          </select>
+        </div>
+        
+        <div>
+          <label for="city" class="block text-gray-700 font-medium mb-2">
+            市区町村 <span class="text-gray-400 text-sm">(任意)</span>
+          </label>
+          <select 
+            id="city" 
+            class="form-select w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+            disabled
+          >
+            <option value="">都道府県を選択すると表示されます</option>
+          </select>
+          <p class="text-sm text-gray-500 mt-1">
+            市区町村を選択するとより詳細な予報を取得できます
+          </p>
+        </div>
+        
+        <!-- 現在地取得ボタン -->
+        <div id="location-detection" class="text-center">
+          <!-- JavaScript で動的に追加されます -->
+        </div>
+        
+        <div class="text-center pt-4">
+          <button 
+            id="search-btn" 
+            class="btn-primary text-white px-8 py-3 rounded-lg font-medium text-lg w-full md:w-auto opacity-50 transition-all duration-300"
+            disabled
+          >
+            <span class="flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              頭痛予報を見る
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ローディング表示 -->
+    <div id="loading" class="hidden">
+      <div class="card bg-white p-8 text-center">
+        <div class="flex flex-col items-center">
+          <div class="loading h-12 w-12 rounded-full border-4 border-gray-200 mb-4"></div>
+          <p class="text-gray-600 text-lg">天気データを取得中...</p>
+          <p class="text-gray-500 text-sm mt-2">しばらくお待ちください</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- エラーメッセージ -->
+    <div id="error-message" class="hidden">
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-r-lg shadow-md">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-red-800 font-medium">エラーが発生しました</h3>
+            <p id="error-text" class="text-red-700 mt-1">地域名が正しくないか、サーバーとの通信に問題があります。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div id="result-section" class="hidden space-y-6">
+      
+      <!-- 頭痛予報カード -->
+      <div class="card bg-white p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+          🎯 頭痛予報
+        </h2>
+        
+        <div id="risk-indicator" class="p-6 rounded-lg mb-6 transition-all duration-300">
+          <div class="flex items-center">
+            <div id="risk-icon" class="w-20 h-20 mr-6 flex items-center justify-center text-4xl bg-white rounded-full shadow-lg"></div>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold mb-2" id="risk-level">頭痛リスク</h3>
+              <p id="risk-forecast" class="text-gray-700 text-lg leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+          <h3 class="font-bold text-gray-800 mb-2 flex items-center">
+            💡 対処法・アドバイス
+          </h3>
+          <p id="risk-advice" class="text-gray-700 leading-relaxed"></p>
+        </div>
+      </div>
+      
+      <!-- 現在の天気カード -->
+      <div class="card bg-white p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          🌡️ <span id="location-display" class="ml-2">地域名</span>の天気情報
+        </h2>
+        
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- 現在の天気 -->
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+            <h3 class="font-bold text-gray-700 border-b border-blue-200 pb-2 mb-3 flex items-center">
+              📍 現在の天気
+            </h3>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600">天気：</span>
+                <span id="current-weather" class="font-medium"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">気温：</span>
+                <span id="current-temp" class="font-medium text-orange-600"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">湿度：</span>
+                <span id="current-humidity" class="font-medium"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">気圧：</span>
+                <span id="current-pressure" class="font-medium text-red-600"></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 今日の予報 -->
+          <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+            <h3 class="font-bold text-gray-700 border-b border-green-200 pb-2 mb-3 flex items-center">
+              📅 今日の予報
+            </h3>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600">天気：</span>
+                <span id="today-weather" class="font-medium"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">最高：</span>
+                <span id="today-max-temp" class="font-medium text-red-500"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">最低：</span>
+                <span id="today-min-temp" class="font-medium text-blue-500"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">気圧：</span>
+                <span id="today-pressure" class="font-medium"></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 明日の予報 -->
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+            <h3 class="font-bold text-gray-700 border-b border-purple-200 pb-2 mb-3 flex items-center">
+              🔮 明日の予報
+            </h3>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600">天気：</span>
+                <span id="tomorrow-weather" class="font-medium"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">最高：</span>
+                <span id="tomorrow-max-temp" class="font-medium text-red-500"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">最低：</span>
+                <span id="tomorrow-min-temp" class="font-medium text-blue-500"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">気圧：</span>
+                <span id="tomorrow-pressure" class="font-medium"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- アクションボタン -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button id="send-btn" class="btn-primary text-white px-8 py-3 rounded-lg font-medium flex items-center justify-center transition-all duration-300 hover:scale-105">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+          </svg>
+          チャットに送信する
+        </button>
+        
+        <button id="refresh-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-medium flex items-center justify-center transition-all duration-300" onclick="location.reload()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          もう一度検索
+        </button>
+      </div>
+    </div>
+
+    <!-- フッター -->
+    <footer class="text-center mt-12 text-gray-600 text-sm">
+      <div class="bg-white bg-opacity-80 rounded-lg p-4 max-w-2xl mx-auto">
+        <p class="mb-2">
+          ⚠️ このアプリは天気予報に基づく予測であり、医学的診断ではありません。
+        </p>
+        <p>
+          実際の症状については医療専門家にご相談ください。
+        </p>
+        <div class="mt-3 pt-3 border-t border-gray-300">
+          <p>
+            Powered by <a href="https://openweathermap.org/" target="_blank" class="text-blue-600 hover:underline">OpenWeatherMap</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Debug panel (開発時のみ表示) -->
+  <div id="debug-panel" class="debug-panel hidden">
+    <h3 class="font-bold mb-2">🔧 デバッグ情報</h3>
+    <div id="debug-log" class="text-xs"></div>
+    <button onclick="document.getElementById('debug-log').innerHTML=''" class="mt-2 text-xs bg-gray-600 text-white px-2 py-1 rounded">
+      ログクリア
+    </button>
+  </div>
+
+  <!-- JavaScript ファイル読み込み -->
+  <script src="js/prefectures.js"></script>
+  <script src="js/headache.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/liff.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
