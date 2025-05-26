@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>頭痛予報 - 設定確認・テスト</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .status-ok { color: #10B981; }
+    .status-error { color: #EF4444; }
+    .status-warning { color: #F59E0B; }
+    .config-item {
+      transition: all 0.3s ease;
+    }
+    .config-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <header class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">🔧 頭痛予報 - 設定確認・テスト</h1>
+      <p class="text-gray-600 mt-2">アプリケーションの設定状況と動作を確認します</p>
+      <div class="mt-4">
+        <a href="index.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          メインアプリに戻る
+        </a>
+      </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto space-y-6">
+      
+      <!-- 設定確認カード -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 flex items-center">
+          ⚙️ 設定確認結果
+        </h2>
+        
+        <div id="config-results" class="grid md:grid-cols-2 gap-4">
+          <!-- 結果がJavaScriptで動的に表示されます -->
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <h3 class="text-lg font-semibold mb-4">🧪 接続テスト</h3>
+          <div class="flex flex-wrap gap-4">
+            <button 
+              id="test-gas-btn" 
+              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center"
+              onclick="testGASConnection()"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              GAS接続テスト
+            </button>
+            
+            <button 
+              id="test-liff-btn" 
+              class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center"
+              onclick="testLIFFConnection()"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              LIFF接続テスト
+            </button>
+            
+            <button 
+              id="test-weather-btn" 
+              class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center"
+              onclick="testWeatherData()"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+              </svg>
+              天気データテスト
+            </button>
+            
+            <button 
+              id="clear-results-btn" 
+              class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center"
+              onclick="clearTestResults()"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              結果クリア
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- テスト結果カード -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 flex items-center">
+          📊 テスト結果
+        </h2>
+        
+        <div id="test-results" class="space-y-4">
+          <div class="text-center text-gray-500 py-8">
+            <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            <p class="text-lg">テストボタンをクリックして接続と動作を確認してください</p>
+            <p class="text-sm mt-2">各テストでアプリケーションの状態をチェックできます</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- デバッグ情報カード -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 flex items-center">
+          🐛 デバッグ情報
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-semibold mb-3">🌐 ブラウザ情報</h3>
+            <div id="browser-info" class="space-y-2 text-sm">
+              <!-- JavaScriptで動的に表示 -->
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold mb-3">📱 デバイス情報</h3>
+            <div id="device-info" class="space-y-2 text-sm">
+              <!-- JavaScriptで動的に表示 -->
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <h3 class="font-semibold mb-3">📝 リアルタイムログ</h3>
+          <div id="realtime-log" class="bg-gray-100 p-4 rounded-lg h-32 overflow-y-auto text-sm font-mono">
+            <div class="text-gray-500">ログが表示されます...</div>
+          </div>
+          <button onclick="clearRealtimeLog()" class="mt-2 text-sm bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition-colors">
+            ログクリア
+          </button>
+        </div>
+      </div>
+
+      <!-- 設定ガイドカード -->
+      <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+        <h2 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+          📚 設定ガイド
+        </h2>
+        
+        <div class="space-y-4 text-blue-700">
+          <div>
+            <h3 class="font-semibold mb-2">❌ エラーが発生している場合:</h3>
+            <ul class="list-disc list-inside space-y-1 text-sm ml-4">
+              <li><strong>LIFF ID未設定:</strong> <code>src/js/liff.js</code> のLIFF_IDを更新</li>
+              <li><strong>GAS URL未設定:</strong> <code>src/js/app.js</code> と <code>src/js/weather.js</code> のGAS_WEB_APP_URLを更新</li>
+              <li><strong>APIキー未設定:</strong> Google Apps ScriptでOpenWeatherMap APIキーを設定</li>
+              <li><strong>CORS エラー:</strong> GASのWebアプリで「アクセスできるユーザー: 全員」に設定</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="font-semibold mb-2">✅ 正常に動作させるために:</h3>
+            <ol class="list-decimal list-inside space-y-1 text-sm ml-4">
+              <li>OpenWeatherMap APIキーを取得</li>
+              <li>Google Apps ScriptでWebアプリを作成・デプロイ</li>
+              <li>LINE DevelopersでLIFFアプリを作成</li>
+              <li>各ファイルで設定値を更新</li>
+              <li>GitHub Pagesでホスティング</li>
+            </ol>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-blue-200">
+          <p class="text-sm text-blue-600">
+            詳細な設定手順は <strong>README.md</strong> を参照してください。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 必要なJSファイルを読み込み -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="js/prefectures.js"></script>
+  <script src="js/headache.js"></script>
+  <script src="js/weather.js"></script>
+  <script src="js/liff.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // テストページ用スクリプト
+    document.addEventListener('DOMContentLoaded', function() {
+      checkConfiguration();
+      displayBrowserInfo();
+      displayDeviceInfo();
+      setupRealtimeLogging();
+    });
+
+    function checkConfiguration() {
+      const results = document.getElementById('config-results');
+      const checks = [];
+
+      // LIFF ID 確認
+      if (typeof LIFF_ID !== 'undefined' && LIFF_ID !== 'your-liff-id-here') {
+        checks.push({
+          name: 'LIFF ID',
+          status: 'ok',
+          message: `設定済み`,
+          details: `ID: ${LIFF_ID.substring(0, 10)}...`,
+          icon: '✅'
+        });
+      } else {
+        checks.push({
+          name: 'LIFF ID',
+          status: 'error',
+          message: '未設定',
+          details: 'src/js/liff.js でLIFF_IDを設定してください',
+          icon: '❌'
+        });
+      }
+
+      // GAS URL 確認（app.js）
+      if (typeof GAS_WEB_APP_URL !== 'undefined' && !GAS_WEB_APP_URL.includes('YOUR_SCRIPT_ID')) {
+        checks.push({
+          name: 'GAS Web App URL',
+          status: 'ok',
+          message: '設定済み',
+          details: 'GAS Web App URLが設定されています',
+          icon: '✅'
+        });
+      } else {
+        checks.push({
+          name: 'GAS Web App URL',
+          status: 'error',
+          message: '未設定',
+          details: 'src/js/app.js と weather.js でURLを設定してください',
+          icon: '❌'
+        });
+      }
+
+      // 都道府県データ確認
+      if (typeof prefectures !== 'undefined' && prefectures.length > 0) {
+        checks.push({
+          name: '都道府県データ',
+          status: 'ok',
+          message: `${prefectures.length}件読み込み`,
+          details: '都道府県データが正常に読み込まれています',
+          icon: '✅'
+        });
+      } else {
+        checks.push({
+          name: '都道府県データ',
+          status: 'error',
+          message: '読み込み失敗',
+          details: 'prefectures.jsが正しく読み込まれていません',
+          icon: '❌'
+        });
+      }
+
+      // LINE SDK確認
+      if (typeof liff !== 'undefined') {
+        checks.push({
+          name: 'LINE LIFF SDK',
+          status: 'ok',
+          message: '読み込み済み',
+          details: 'LINE LIFF SDKが正常に読み込まれています',
+          icon: '✅'
+        });
+      } else {
+        checks.push({
+          name: 'LINE LIFF SDK',
+          status: 'warning',
+          message: '読み込み未完了',
+          details: 'LINE環境でない、またはSDKの読み込みが未完了',
+          icon: '⚠️'
+        });
+      }
+
+      // 結果表示
+      results.innerHTML = checks.map(check => `
+        <div class="config-item bg-gray-50 p-4 rounded-lg border-l-4 border-${getStatusColor(check.status)}-500">
+          <div class="flex items-start space-x-3">
+            <span class="text-2xl">${check.icon}</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h3 class="font-medium text-gray-900">${check.name}</h3>
+                <span class="status-${check.status} font-medium text-sm px-2 py-1 rounded-full bg-${getStatusColor(check.status)}-100">
+                  ${check.message}
+                </span>
+              </div>
+              <p class="text-sm text-gray-600 mt-1">${check.details}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getStatusColor(status) {
+      switch (status) {
+        case 'ok': return 'green';
+        case 'warning': return 'yellow';
+        case 'error': return 'red';
+        default: return 'gray';
+      }
+    }
+
+    function displayBrowserInfo() {
+      const browserInfo = document.getElementById('browser-info');
+      const info = [
+        ['ブラウザ', navigator.userAgent.split(' ')[0] || 'Unknown'],
+        ['言語', navigator.language || 'Unknown'],
+        ['画面解像度', `${screen.width}x${screen.height}`],
+        ['ビューポート', `${window.innerWidth}x${window.innerHeight}`],
+        ['オンライン状態', navigator.onLine ? 'オンライン' : 'オフライン'],
+        ['Cookie有効', navigator.cookieEnabled ? '有効' : '無効']
+      ];
+
+      browserInfo.innerHTML = info.map(([key, value]) => `
+        <div class="flex justify-between">
+          <span class="text-gray-600">${key}:</span>
+          <span class="font-medium">${value}</span>
+        </div>
+      `).join('');
+    }
+
+    function displayDeviceInfo() {
+      const deviceInfo = document.getElementById('device-info');
+      const info = [
+        ['プラットフォーム', navigator.platform || 'Unknown'],
+        ['タッチサポート', 'ontouchstart' in window ? 'あり' : 'なし'],
+        ['位置情報', navigator.geolocation ? '利用可能' : '利用不可'],
+        ['ローカルストレージ', typeof(Storage) !== "undefined" ? '利用可能' : '利用不可'],
+        ['Service Worker', 'serviceWorker' in navigator ? '対応' : '非対応'],
+        ['接続タイプ', navigator.connection ? navigator.connection.effectiveType : 'Unknown']
+      ];
+
+      deviceInfo.innerHTML = info.map(([key, value]) => `
+        <div class="flex justify-between">
+          <span class="text-gray-600">${key}:</span>
+          <span class="font-medium">${value}</span>
+        </div>
+      `).join('');
+    }
+
+    function setupRealtimeLogging() {
+      // console.logをオーバーライドしてリアルタイムログに表示
+      const originalLog = console.log;
+      const logElement = document.getElementById('realtime-log');
+      
+      console.log = function(...args) {
+        originalLog.apply(console, args);
+        const timestamp = new Date().toLocaleTimeString();
+        const message = args.join(' ');
+        const logEntry = document.createElement('div');
+        logEntry.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> ${message}`;
+        logElement.appendChild(logEntry);
+        logElement.scrollTop = logElement.scrollHeight;
+      };
+    }
+
+    function clearRealtimeLog() {
+      document.getElementById('realtime-log').innerHTML = '<div class="text-gray-500">ログがクリアされました...</div>';
+    }
+
+    async function testGASConnection() {
+      const results = document.getElementById('test-results');
+      const button = document.getElementById('test-gas-btn');
+      
+      button.disabled = true;
+      button.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>テスト中...';
+      
+      try {
+        results.innerHTML = '<div class="flex items-center text-blue-600 p-4"><div class="animate-spin w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full mr-3"></div>GAS接続をテスト中...</div>';
+        
+        console.log('GAS接続テスト開始');
+        const testData = await getWeatherData('東京都');
+        console.log('GAS接続テスト成功', testData);
+        
+        results.innerHTML = `
+          <div class="p-6 bg-green-50 border border-green-200 rounded-lg">
+            <h3 class="font-bold text-green-800 flex items-center text-lg mb-3">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              GAS接続成功
+            </h3>
+            <p class="text-green-700 mb-4">天気データが正常に取得できました。</p>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="font-medium">場所:</span>
+                  <span>${testData.currentWeather.location || '東京都'}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">天気:</span>
+                  <span>${testData.currentWeather.weatherMain}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">気温:</span>
+                  <span>${testData.currentWeather.temperature}℃</span>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="font-medium">湿度:</span>
+                  <span>${testData.currentWeather.humidity}%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">気圧:</span>
+                  <span>${testData.currentWeather.pressure}hPa</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">予報:</span>
+                  <span>${testData.forecast.today ? '取得済み' : '取得失敗'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+      } catch (error) {
+        console.error('GAS接続テスト失敗', error);
+        results.innerHTML = `
+          <div class="p-6 bg-red-50 border border-red-200 rounded-lg">
+            <h3 class="font-bold text-red-800 flex items-center text-lg mb-3">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              GAS接続失敗
+            </h3>
+            <p class="text-red-700 mb-4">エラー: ${error.message}</p>
+            <div class="bg-red-100 p-4 rounded text-sm text-red-800">
+              <p class="font-medium mb-2">確認事項:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>GAS Web App URLが正しく設定されているか</li>
+                <li>GASでOpenWeatherMap APIキーが設定されているか</li>
+                <li>GASが「アクセスできるユーザー: 全員」に設定されているか</li>
+                <li>インターネット接続が正常か</li>
+              </ul>
+            </div>
+          </div>
+        `;
+      } finally {
+        button.disabled = false;
+        button.innerHTML = `
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          GAS接続テスト
+        `;
+      }
+    }
+
+    async function testLIFFConnection() {
+      const results = document.getElementById('test-results');
+      const button = document.getElementById('test-liff-btn');
+      
+      button.disabled = true;
+      button.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>テスト中...';
+      
+      try {
+        results.innerHTML = '<div class="flex items-center text-blue-600 p-4"><div class="animate-spin w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full mr-3"></div>LIFF接続をテスト中...</div>';
+        
+        if (typeof liff === 'undefined') {
+          throw new Error('LIFF SDKが読み込まれていません');
+        }
+        
+        if (typeof LIFF_ID === 'undefined' || LIFF_ID === 'your-liff-id-here') {
+          throw new Error('LIFF IDが設定されていません');
+        }
+        
+        console.log('LIFF初期化テスト開始');
+        await liff.init({ liffId: LIFF_ID });
+        console.log('LIFF初期化成功');
+        
+        const isInClient = liff.isInClient();
+        const isLoggedIn = liff.isLoggedIn();
+        const os = liff.getOS();
+        const language = liff.getLanguage();
+        const version = liff.getVersion();
+        
+        results.innerHTML = `
+          <div class="p-6 bg-green-50 border border-green-200 rounded-lg">
+            <h3 class="font-bold text-green-800 flex items-center text-lg mb-3">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              LIFF接続成功
+            </h3>
+            <p class="text-green-700 mb-4">LIFFが正常に初期化されました。</p>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="font-medium">LIFF ID:</span>
+                  <span class="text-xs">${LIFF_ID.substring(0, 10)}...</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">LINE環境:</span>
+                  <span>${isInClient ? '✅ LINE内' : '❌ 外部ブラウザ'}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">ログイン状態:</span>
+                  <span>${isLoggedIn ? '✅ ログイン済み' : '❌ 未ログイン'}</span>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="font-medium">OS:</span>
+                  <span>${os}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">言語:</span>
+                  <span>${language}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">LIFF Version:</span>
+                  <span>${version}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+      } catch (error) {
+        console.error('LIFF接続テスト失敗', error);
+        results.innerHTML = `
+          <div class="p-6 bg-red-50 border border-red-200 rounded-lg">
+            <h3 class="font-bold text-red-800 flex items-center text-lg mb-3">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              LIFF接続失敗
+            </h3>
+            <p class="text-red-700 mb-4">エラー: ${error.message}</p>
+            <div class="bg-red-100 p-4 rounded text-sm text-red-800">
+              <p class="font-medium mb-2">確認事項:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>LIFF IDが正しく設定されているか</li>
+                <li>LIFF アプリのエンドポイントURLが正しいか</li>
+                <li>LINE Developersでの設定が完了しているか</li>
+                <li>LIFFアプリが有効化されているか</li>
+              </ul>
+            </div>
+          </div>
+        `;
+      } finally {
+        button.disabled = false;
+        button.innerHTML = `
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          LIFF接続テスト
+        `;
+      }
+    }
+
+    async function testWeatherData() {
+      const results = document.getElementById('test-results');
+      const button = document.getElementById('test-weather-btn');
+      
+      button.disabled = true;
+      button.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>テスト中...';
+      
+      try {
+        results.innerHTML = '<div class="flex items-center text-blue-600 p-4"><div class="animate-spin w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full mr-3"></div>複数地域の天気データをテスト中...</div>';
+        
+        const testCities = ['東京都', '大阪府', '北海道', '福岡県', '沖縄県'];
+        const results_data = [];
+        
+        for (const city of testCities) {
+          try {
+            console.log(`${city}の天気データをテスト中`);
+            const data = await getWeatherData(city);
+            results_data.push({
+              city: city,
+              success: true,
+              data: data
+            });
+          } catch (error) {
+            results_data.push({
+              city: city,
+              success: false,
+              error: error.message
+            });
+          }
+        }
+        
+        const successCount = results_data.filter(r => r.success).length;
+        const successRate = Math.round((successCount / testCities.length) * 100);
+        
+        results.innerHTML = `
+          <div class="p-6 bg-${successRate >= 80 ? 'green' : successRate >= 50 ? 'yellow' : 'red'}-50 border border-${successRate >= 80 ? 'green' : successRate >= 50 ? 'yellow' : 'red'}-200 rounded-lg">
+            <h3 class="font-bold text-${successRate >= 80 ? 'green' : successRate >= 50 ? 'yellow' : 'red'}-800 flex items-center text-lg mb-3">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+              </svg>
+              天気データテスト結果
+            </h3>
+            <p class="text-${successRate >= 80 ? 'green' : successRate >= 50 ? 'yellow' : 'red'}-700 mb-4">
+              成功率: ${successRate}% (${successCount}/${testCities.length}件)
+            </p>
+            <div class="space-y-3">
+              ${results_data.map(result => `
+                <div class="flex items-center justify-between p-3 bg-white rounded border">
+                  <div class="flex items-center">
+                    <span class="mr-3">${result.success ? '✅' : '❌'}</span>
+                    <span class="font-medium">${result.city}</span>
+                  </div>
+                  <div class="text-sm text-gray-600">
+                    ${result.success ? 
+                      `${result.data.currentWeather.weatherMain} / ${result.data.currentWeather.temperature}℃` : 
+                      `エラー: ${result.error}`
+                    }
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        
+      } catch (error) {
+        console.error('天気データテスト失敗', error);
+        results.innerHTML = `
+          <div class="p-6 bg-red-50 border border-red-200 rounded-lg">
+            <h3 class="font-bold text-red-800 flex items-center text-lg mb-3">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              天気データテスト失敗
+            </h3>
+            <p class="text-red-700">エラー: ${error.message}</p>
+          </div>
+        `;
+      } finally {
+        button.disabled = false;
+        button.innerHTML = `
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+          </svg>
+          天気データテスト
+        `;
+      }
+    }
+
+    function clearTestResults() {
+      document.getElementById('test-results').innerHTML = `
+        <div class="text-center text-gray-500 py-8">
+          <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          <p class="text-lg">テスト結果がクリアされました</p>
+          <p class="text-sm mt-2">テストボタンをクリックして再度確認してください</p>
+        </div>
+      `;
+    }
+
+    // デバッグ用のグローバル関数
+    function debugLog(message) {
+      console.log('[Debug]', message);
+    }
+  </script>
+</body>
+</html>
